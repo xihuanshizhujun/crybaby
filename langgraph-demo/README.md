@@ -89,7 +89,7 @@ docker run -p 8080:8080 -p 50051:50051 semitechnologies/weaviate:latest
 ### 启动 Streamlit 前端
 
 ```bash
-streamlit run streamlit_app.py
+python -m streamlit run streamlit_app.py
 ```
 
 ### 使用 LangGraph Server（可选）
