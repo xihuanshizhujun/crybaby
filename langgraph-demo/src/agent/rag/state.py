@@ -1,7 +1,8 @@
 """图RAG状态定义"""
 
-from typing import TypedDict, List, Dict, Any, Optional
+from typing import TypedDict, List, Dict, Any, Optional,Annotated
 from langchain_core.messages import BaseMessage
+from operator import add
 
 
 class GraphRAGState(TypedDict):
@@ -19,9 +20,20 @@ class GraphRAGState(TypedDict):
     query: str
     user_id: Optional[str]
     
+    # 查询分解
+    sub_queries: List[str]  # 子查询列表
+    sub_query_results: Dict[str, List[Dict[str, Any]]]  # 每个子查询的检索结果
+    
     # 检索结果
     retrieved_chunks: List[Dict[str, Any]]
     retrieval_scores: List[float]
+    
+    # 重排序结果（语义增强）
+    reranked_chunks: Annotated[List[Dict[str, Any]],add]
+    
+    # 网络搜索结果
+    web_search_results: List[Dict[str, Any]]
+    use_web_search: bool
     
     # 反思阶段
     reflection_result: Optional[str]

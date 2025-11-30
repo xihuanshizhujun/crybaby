@@ -8,16 +8,16 @@ try:
     )
 
 
-
+    #
     # client.collections.delete(
-    #     #     "FinancialDoc"
-    #     # )
+    #          "FinancialDoc"
+    #     )
     #
     collection = client.collections.get("FinancialDoc")
     for item in collection.iterator(
             include_vector=True
     ):
         print(item.properties['content'])
-        # print(item.vector)
+        print(item.vector)
 finally:
     client.close()

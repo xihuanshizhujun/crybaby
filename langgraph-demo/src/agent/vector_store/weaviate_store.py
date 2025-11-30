@@ -8,7 +8,7 @@ from weaviate.classes.config import Configure, Property, DataType
 from weaviate.classes.query import MetadataQuery
 
 from agent.vector_store.base import VectorStore, VectorStoreError, DocumentChunk, SearchResult
-from agent.config import VectorDBConfig
+from agent.config import VectorDBConfig, config
 
 logger = logging.getLogger(__name__)
 
@@ -120,9 +120,10 @@ class WeaviateVectorStore(VectorStore):
                     logger.warning(f"跳过没有向量的文档块: {chunk.id}")
                     continue
                 
-                # 验证向量维度（text-embedding-3-small 应该是 1536）
-                if len(chunk.embedding) != 1536:
-                    logger.warning(f"文档块 {chunk.id} 的向量维度不正确: {len(chunk.embedding)}, 期望: 1536")
+                # 验证向量维度（使用配置中的维度）
+                expected_dimensions = config.embedding.dimensions
+                if len(chunk.embedding) != expected_dimensions:
+                    logger.warning(f"文档块 {chunk.id} 的向量维度不正确: {len(chunk.embedding)}, 期望: {expected_dimensions}")
                     continue
                 
                 # 处理 UUID：确保是有效的 UUID 格式
@@ -165,8 +166,9 @@ class WeaviateVectorStore(VectorStore):
                 inserted_ids.append(str(chunk_uuid))
             
             if not objects_to_insert:
+                expected_dimensions = config.embedding.dimensions
                 logger.warning(f"没有可插入的文档对象。输入块数: {len(chunks)}, "
-                             f"有效块数: {len([c for c in chunks if c.embedding is not None and len(c.embedding) == 1536])}")
+                             f"有效块数: {len([c for c in chunks if c.embedding is not None and len(c.embedding) == expected_dimensions])}")
                 return []
             
             # 批量插入（分批处理，避免一次性插入太多）

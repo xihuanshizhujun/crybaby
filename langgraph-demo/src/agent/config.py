@@ -25,7 +25,7 @@ class VectorDBConfig:
 @dataclass
 class LLMConfig:
     """LLM配置"""
-    model_name: str = "gpt-4o-mini"
+    model_name: str = "gpt-4o"
     temperature: float = 0.1
     max_tokens: int = 2000
     timeout: int = 30
@@ -57,7 +57,7 @@ class RAGConfig:
     """RAG配置"""
     top_k: int = 5
     rerank_top_k: int = 3
-    similarity_threshold: float = 0.7
+    similarity_threshold: float = 0.4  # 降低阈值，使检索更宽松
     max_iterations: int = 3
     enable_reflection: bool = True
     enable_iteration: bool = True
@@ -129,7 +129,7 @@ class Config:
         self.rag = RAGConfig(
             top_k=int(os.getenv("RAG_TOP_K", "5")),
             rerank_top_k=int(os.getenv("RAG_RERANK_TOP_K", "3")),
-            similarity_threshold=float(os.getenv("RAG_SIMILARITY_THRESHOLD", "0.7")),
+            similarity_threshold=float(os.getenv("RAG_SIMILARITY_THRESHOLD", "0.4")),  # 默认0.4，平衡检索严格度和召回率
             max_iterations=int(os.getenv("RAG_MAX_ITERATIONS", "3")),
         )
         

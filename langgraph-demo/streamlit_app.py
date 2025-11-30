@@ -5,16 +5,15 @@ import os
 import uuid
 from pathlib import Path
 
-# 导入项目模块
-from agent.data_processor.file_manager import FileManager
-from agent.data_processor.parser import DocumentParser  # 兼容性导入
-from agent.data_processor.chunker import chunk_documents
+# 导入项目模块 - 使用 deep-searcher loader
+from agent.data_processor.file_loader import get_file_loader
+from agent.data_processor.text_splitter import get_text_splitter
+from agent.config import config
 from agent.vector_store.factory import VectorStoreFactory
 from agent.vector_store.base import DocumentChunk
 from agent.utils.embedding import generate_embeddings
 from agent.rag.graph import get_rag_graph
 from agent.rag.state import GraphRAGState
-from agent.config import config
 from langchain_core.messages import HumanMessage
 
 
@@ -58,20 +57,27 @@ def process_uploaded_files(uploaded_files):
             f.write(uploaded_file.getbuffer())
 
         try:
-            # 使用FileManager解析文档（支持更多格式，更好的中文支持）
-            if not FileManager.is_supported(str(file_path)):
+            # 使用 FileLoader 加载文件
+            file_loader = get_file_loader()
+            if not file_loader.is_supported(str(file_path)):
                 st.error(f"不支持的文件格式: {uploaded_file.name}")
                 continue
             
-            content = FileManager.parse_file(str(file_path))
-
-            # 分块
+            # 加载文件
+            doc_data = file_loader.load(str(file_path))
+            
+            # 使用 TextSplitter 分块
+            text_splitter = get_text_splitter()
+            
             doc_id = str(uuid.uuid4())
-            chunks = chunk_documents(
-                content=content,
+            doc_type = uploaded_file.name.split(".")[-1] if "." in uploaded_file.name else "unknown"
+            
+            # 分割文档
+            chunks = text_splitter.split_documents(
+                content=doc_data,
                 doc_id=doc_id,
                 user_id=st.session_state.user_id,
-                doc_type=uploaded_file.name.split(".")[-1],
+                doc_type=doc_type,
             )
 
             # 生成嵌入向量
@@ -108,7 +114,8 @@ def process_uploaded_files(uploaded_files):
     status_text.text("处理完成！")
     st.success(f"成功处理 {len(uploaded_files)} 个文件，共 {len(all_chunks)} 个文档块")
 
-    # 清理临时文件
+    # 清理临时文件（已注释，如需保留文件请保持注释状态）
+    # 如果需要保留上传的文件，请保持以下代码注释
     for uploaded_file in uploaded_files:
         file_path = upload_dir / uploaded_file.name
         if file_path.exists():
