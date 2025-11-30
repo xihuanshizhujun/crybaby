@@ -1,0 +1,45 @@
+# Streamlit 配置文件
+# 用于配置前端界面的启动参数
+
+[server]
+# 服务器端口（默认 8501）
+port = 8501
+
+# 服务器地址（默认 localhost）
+address = "localhost"
+
+# 是否启用 XSRF 保护（启用后会自动启用 CORS，所以不需要单独设置 enableCORS）
+enableXsrfProtection = true
+
+# 最大上传文件大小（MB）
+maxUploadSize = 200
+
+# 最大消息大小（MB）
+maxMessageSize = 200
+
+# 是否启用 WebSocket 压缩
+enableWebsocketCompression = false
+
+[browser]
+# 是否收集使用统计
+gatherUsageStats = false
+
+[theme]
+# 主题配置
+primaryColor = "#1f77b4"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "sans serif"
+
+[runner]
+# 是否快速重载
+fastReruns = true
+
+# 是否启用魔术命令
+magicEnabled = true
+
+[logger]
+# 日志级别
+level = "info"
+
